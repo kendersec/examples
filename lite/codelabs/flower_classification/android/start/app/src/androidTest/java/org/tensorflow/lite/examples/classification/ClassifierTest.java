@@ -38,7 +38,6 @@ import org.junit.runner.RunWith;
 import org.tensorflow.lite.examples.classification.tflite.Classifier;
 import org.tensorflow.lite.examples.classification.tflite.Classifier.Device;
 import org.tensorflow.lite.examples.classification.tflite.Classifier.Model;
-import org.tensorflow.lite.examples.classification.tflite.Classifier.Recognition;
 
 /** Golden test for Image Classification Reference app. */
 @RunWith(AndroidJUnit4.class)

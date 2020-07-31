@@ -17,7 +17,6 @@ package org.tensorflow.lite.examples.classification.tflite;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.os.SystemClock;
 import android.os.Trace;
 import java.io.IOException;
@@ -29,13 +28,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.examples.classification.Recognition;
 import org.tensorflow.lite.examples.classification.env.Logger;
-import org.tensorflow.lite.examples.classification.tflite.Classifier.Device;
-import org.tensorflow.lite.gpu.GpuDelegate;
 import org.tensorflow.lite.support.common.FileUtil;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.common.TensorProcessor;
-import org.tensorflow.lite.support.image.ImageOperator;
 import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.image.ops.ResizeOp;
@@ -46,7 +43,7 @@ import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 /** A classifier specialized to label images using TensorFlow Lite. */
-public abstract class Classifier {
+public abstract class Classifier implements org.tensorflow.lite.examples.classification.IClassifier {
   private static final Logger LOGGER = new Logger();
 
   /** The runtime device type used for executing classification. */
@@ -104,76 +101,6 @@ public abstract class Classifier {
     return new ClassifierFloatMobileNet(activity, device, numThreads);
   }
 
-  /** An immutable result returned by a Classifier describing what was recognized. */
-  public static class Recognition {
-    /**
-     * A unique identifier for what has been recognized. Specific to the class, not the instance of
-     * the object.
-     */
-    private final String id;
-
-    /** Display name for the recognition. */
-    private final String title;
-
-    /**
-     * A sortable score for how good the recognition is relative to others. Higher should be better.
-     */
-    private final Float confidence;
-
-    /** Optional location within the source image for the location of the recognized object. */
-    private RectF location;
-
-    public Recognition(
-        final String id, final String title, final Float confidence, final RectF location) {
-      this.id = id;
-      this.title = title;
-      this.confidence = confidence;
-      this.location = location;
-    }
-
-    public String getId() {
-      return id;
-    }
-
-    public String getTitle() {
-      return title;
-    }
-
-    public Float getConfidence() {
-      return confidence;
-    }
-
-    public RectF getLocation() {
-      return new RectF(location);
-    }
-
-    public void setLocation(RectF location) {
-      this.location = location;
-    }
-
-    @Override
-    public String toString() {
-      String resultString = "";
-      if (id != null) {
-        resultString += "[" + id + "] ";
-      }
-
-      if (title != null) {
-        resultString += title + " ";
-      }
-
-      if (confidence != null) {
-        resultString += String.format("(%.1f%%) ", confidence * 100.0f);
-      }
-
-      if (location != null) {
-        resultString += location + " ";
-      }
-
-      return resultString.trim();
-    }
-  }
-
   /** Initializes a {@code Classifier}. */
   protected Classifier(Activity activity, Device device, int numThreads) throws IOException {
     tfliteModel = FileUtil.loadMappedFile(activity, getModelPath());
@@ -218,6 +145,7 @@ public abstract class Classifier {
   }
 
   /** Runs inference and returns the classification results. */
+  @Override
   public List<Recognition> recognizeImage(final Bitmap bitmap, int sensorOrientation) {
     // Logs this method so that it can be analyzed with systrace.
     Trace.beginSection("recognizeImage");
@@ -253,6 +181,7 @@ public abstract class Classifier {
   }
 
   /** Closes the interpreter and model to release resources. */
+  @Override
   public void close() {
     if (tflite != null) {
       // TODO: Close the interpreter
@@ -266,11 +195,13 @@ public abstract class Classifier {
   }
 
   /** Get the image size along the x axis. */
+  @Override
   public int getImageSizeX() {
     return imageSizeX;
   }
 
   /** Get the image size along the y axis. */
+  @Override
   public int getImageSizeY() {
     return imageSizeY;
   }

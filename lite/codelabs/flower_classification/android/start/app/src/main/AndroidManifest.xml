@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.tensorflow.lite.examples.classification">
+    package="org.tensorflow.lite.examples.classification.onnx">
 
     <uses-sdk />
 
@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ImageClassification">
         <activity
-            android:name=".ClassifierActivity"
+            android:name="org.tensorflow.lite.examples.classification.ClassifierActivity"
             android:label="@string/tfe_ic_app_name"
             android:screenOrientation="portrait">
             <intent-filter>

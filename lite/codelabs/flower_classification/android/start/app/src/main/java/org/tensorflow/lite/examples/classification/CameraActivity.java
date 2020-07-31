@@ -53,8 +53,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import org.tensorflow.lite.examples.classification.env.ImageUtils;
 import org.tensorflow.lite.examples.classification.env.Logger;
+import org.tensorflow.lite.examples.classification.onnx.R;
 import org.tensorflow.lite.examples.classification.tflite.Classifier.Device;
-import org.tensorflow.lite.examples.classification.tflite.Classifier.Recognition;
 
 public abstract class CameraActivity extends AppCompatActivity
     implements OnImageAvailableListener,

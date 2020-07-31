@@ -21,12 +21,15 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import java.io.IOException;
 import java.util.List;
 import org.tensorflow.lite.examples.classification.env.BorderedText;
 import org.tensorflow.lite.examples.classification.env.Logger;
+import org.tensorflow.lite.examples.classification.onnx.OnnxClassifier;
+import org.tensorflow.lite.examples.classification.onnx.R;
 import org.tensorflow.lite.examples.classification.tflite.Classifier;
 import org.tensorflow.lite.examples.classification.tflite.Classifier.Device;
 
@@ -37,7 +40,7 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
   private Bitmap rgbFrameBitmap = null;
   private long lastProcessingTimeMs;
   private Integer sensorOrientation;
-  private Classifier classifier;
+  private IClassifier classifier;
   private BorderedText borderedText;
   /** Input image size of the model along x axis. */
   private int imageSizeX;
@@ -89,7 +92,7 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
           public void run() {
             if (classifier != null) {
               final long startTime = SystemClock.uptimeMillis();
-              final List<Classifier.Recognition> results =
+              final List<Recognition> results =
                   classifier.recognizeImage(rgbFrameBitmap, sensorOrientation);
               lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
               LOGGER.v("Detect: %s", results);
@@ -124,18 +127,19 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
   }
 
   private void recreateClassifier(Device device, int numThreads) {
+
     if (classifier != null) {
       LOGGER.d("Closing classifier.");
       classifier.close();
       classifier = null;
     }
-    try {
+//    try {
       LOGGER.d(
           "Creating classifier (device=%s, numThreads=%d)", device, numThreads);
-      classifier = Classifier.create(this, device, numThreads);
-    } catch (IOException e) {
-      LOGGER.e(e, "Failed to create classifier.");
-    }
+      classifier = new OnnxClassifier(this); //Classifier.create(this, device, numThreads);
+//    } catch (IOException e) {
+//      LOGGER.e(e, "Failed to create classifier.");
+//    }
 
     // Updates the input image size.
     imageSizeX = classifier.getImageSizeX();
